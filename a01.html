@@ -1,0 +1,224 @@
+<!--
+Filename: a01.html
+Project: a01
+Date: September 22nd, 2022
+Author: Maísa Wolff Resplande
+Description: This file contains an application in HTML for the game Hi-Lo.
+-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hi-Lo Game</title>
+
+        <!-- Includes script-->
+        <script type="text/javascript">
+            
+            var name = "";
+            var maximumNumber = 0;
+            var randomNumber = 0;
+            var guessNumber = 0;
+            const minimumNumber = 1;
+
+            /*
+            * Function: enterName()
+            * Parameter : none
+            * Return value : none
+            * Description : This function prompts the user to enter their name. 
+            * The function displays an error message if the input doesn’t follow the standards. 
+            * Otherwise, the function stores the value, omits the current section, and shows the next section in the game. 
+            */
+            function enterName()
+            {
+                name = document.getElementById("userName").value; //get input
+                var nameLength = (name.trim()).length;
+
+                document.getElementById("nameError").innerHTML = ""; //cleans error message
+
+                if (nameLength == 0)
+                {
+                    document.getElementById("nameError").innerHTML = "You can't enter a blank name.";
+                }
+                else
+                {
+                    document.getElementById("section1").style.display="none";
+                    document.getElementById("section2").style.display="block";
+                    document.getElementById("askForNumber").innerHTML="Okay, " + name + ", now you can choose a maximum number to determine the game range.";
+                }
+            }
+
+            /*
+            * Function: enterMaximumNumber()
+            * Parameter : none
+            * Return value : none
+            * Description : This function prompts the user to enter the maximum guess number. 
+            * The function displays an error message if the input doesn’t follow the standards. 
+            * Otherwise, the function stores the value, omits the current section, and shows the next section in the game. 
+            */
+            function enterMaximumNumber()
+            {            
+                document.getElementById("numberError").innerHTML = "";
+
+                maximumNumber = document.getElementById("maximumGuessNumber").value; //get input
+                var integerNumber = /^[0-9]+$/;
+
+                if(maximumNumber.match(integerNumber) && maximumNumber > 0)
+                {
+                    maximumNumber = parseInt(maximumNumber);
+                    randomNumber = generateRandomNumber(maximumNumber);
+                    document.getElementById("section2").style.display="none";
+                    document.getElementById("section3").style.display="block";
+                    document.getElementById("askForGuess").innerHTML=name + ", your allowable guessing range" +
+                    " is any value between " + minimumNumber + " and " + maximumNumber + ". Enter a guess and good luck!";
+                }
+                else
+                {
+                    document.getElementById("numberError").innerHTML = "You need to enter an integer number greater than zero.";
+                }
+            }
+
+            /*
+            * Function: generateRandomNumber(number)
+            * Parameter : int number - the maximum number
+            * Return value : int randomNumber - the number the user has to guess
+            * Description : This function generate an integer random number between 1 and the maximum guess number entered by the user.
+            */
+            function generateRandomNumber(number)
+            {
+                randomNumber = Math.floor(Math.random() * number) + 1;
+                return randomNumber;
+            }
+
+            /*
+            * Function: makeThisGuess()
+            * Parameter : none
+            * Return value : none
+            * Description : This function prompts the user to enter a guess. 
+            * The function displays an error message if the input doesn’t follow the standards. 
+            * Otherwise, the function checks whether the user guessed the correct number. 
+            * If so, it shows a message “You Win” and a button to play again. 
+            * If not, it shows a new range for the user, considering their previous guess. 
+            */
+            function makeThisGuess()
+            {
+                var integerNumber = /^[0-9]+$/;
+                var newRange = 0;
+
+                document.getElementById("guessError").innerHTML = "";
+                
+                guessNumber = document.getElementById("guessNumber").value; //get input
+
+                if (guessNumber.match(integerNumber)) //check if the user entered an integer
+                {
+                    guessNumber = parseInt(guessNumber);
+
+                    if (guessNumber < minimumNumber || guessNumber > maximumNumber) //check if the guess is within the range
+                    {
+                        document.getElementById("guessError").innerHTML = "Your allowable guessing range" +
+                            " is any value between " + minimumNumber + " and " + maximumNumber;
+                    }
+                    else
+                    {
+                        if (guessNumber == randomNumber) //check if the user won the game
+                        {
+                            document.getElementById("section3").style.display="none";
+                            document.getElementById("section4").style.display="block";
+                            document.body.style.backgroundColor = "#D8C5E1"; //changes background color
+                        }
+                        else //display new ranges
+                        {
+                            if (guessNumber < randomNumber)
+                            {
+                                newRange = guessNumber + 1;
+                                document.getElementById("askForGuess").innerHTML=name + ", you didn't get it right." +
+                                "Your allowable guessing range" + " is any value between " + newRange + 
+                                " and " + maximumNumber + ". Try again!";
+                            }
+                            else
+                            {
+                                newRange = guessNumber - 1;
+                                document.getElementById("askForGuess").innerHTML=name + ", you didn't get it right." +
+                                "Your allowable guessing range" + " is any value between " + minimumNumber + 
+                                " and " + newRange + ". Try again!";
+                            }        
+                        }
+                    }
+                }
+                else //error message
+                {
+                    document.getElementById("guessError").innerHTML = "You need to enter an integer number." + 
+                    "Your allowable guessing range" + " is any value between " + minimumNumber + " and " + maximumNumber;
+                }
+            }
+
+             /*
+            * Function: playAgain()
+            * Parameter : none
+            * Return value : none
+            * Description : This function omits the current section, and shows the section to enter a maximum guess number. 
+            */
+            function playAgain()
+            {
+                document.getElementById("section2").style.display="block"; //displays the section to enter a new maximum guess number
+                document.getElementById("section4").style.display="none";
+                document.getElementById("maximumGuessNumber").value = "";
+                document.getElementById("guessNumber").value = "";
+                document.body.style.backgroundColor = "#FFFF"; //restore background color
+            }
+        </script>
+
+        <!-- Includes style-->
+        <style>
+            body {
+                display: flex;
+                height: 100vh;
+                justify-content: center;
+                align-items: center;
+                background: #D8C5E1;
+            }
+        </style>
+
+    </head>
+    <body>
+        <!-- Initial section: prompts the user for their name -->
+        <div id="section1">
+            <p>Welcome to Hi-Lo Game. Here are the rules:
+            <br>1 - You can choose a maximum guess number that must be an integer.
+            <br>2 - The program will generate a random number between 1 and the maximum guess number you entered.
+            <br>3 - You win the game when you guess the correct number generated by the program.
+            <br>
+            <br>But, before you start playing, tell us your name, please.</p>
+            <input name="name" id="userName" type="text" placeholder="Enter name">
+            <input id="submitName" type="button" value="Submit name" onclick="enterName();">
+            <div id="nameError" style="color:red;"></div>
+        </div>
+
+        <!-- Second section: prompts the user for a maximum guess number -->
+        <div id="section2" style="display:none">
+            <p id="askForNumber"></p>
+            <input name="maximumNumber" id="maximumGuessNumber" type="text" placeholder="Enter maximum number">
+            <input id="submitMaximumNumber" type="button" value="Submit number" onclick="enterMaximumNumber();">
+            <div id="numberError" style="color:red;"></div>
+        </div>
+
+        <!-- Third section: prompts the user for a guess -->
+        <div id="section3" style="display:none">
+            <p id="askForGuess"></p>
+            <input name="guessNumber" id="guessNumber" type="text" placeholder="Your guess">
+            <input type="button" value="MAKE THIS GUESS" onclick="makeThisGuess();" />
+            <div id="guessError" style="color:red;"></div>
+        </div>
+
+        <!-- Fourth section: displays a message and an option to play again -->
+        <div id="section4" style="display:none">
+            <p id="youWin" style="color:blueviolet">
+                <strong>
+                    <font size="7"> 
+                        YOU WIN
+                    </font>
+                </strong>
+            </p>
+            <input type="button" value="Play Again" onclick="playAgain();" />
+        </div>
+    </body>
+</html>
